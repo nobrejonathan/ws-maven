@@ -1,0 +1,84 @@
+#labels postgres
+Luciano dos Passos Almeida
+Manual de Implantação ProjetoWebService
+
+Implantando projeto no Jboss-as-7.1.1.Final
+
+Primeiro passo 
+
+Configurar o driver do Postgre
+
+Na pasta do Jboss entre em modules/com
+e crie uma pasta chamada postgre e dentro desse diretório crie uma pasta chamada main.
+Copie o driver do postgre para dentro dessa pasta main.
+ 
+Crie um arquivo com o nome module.xml com o seguinte conteudo:
+ 
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ JBoss, Home of Professional Open Source.
+  ~ Copyright 2010, Red Hat, Inc., and individual contributors
+  ~ as indicated by the @author tags. See the copyright.txt file in the
+  ~ distribution for a full listing of individual contributors.
+  ~
+  ~ This is free software; you can redistribute it and/or modify it
+  ~ under the terms of the GNU Lesser General Public License as
+  ~ published by the Free Software Foundation; either version 2.1 of
+  ~ the License, or (at your option) any later version.
+  ~
+  ~ This software is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  ~ Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public
+  ~ License along with this software; if not, write to the Free
+  ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  -->
+<module xmlns="urn:jboss:module:1.1" name="com.postgre">
+
+    <resources>
+        <resource-root path="postgresql-9.3-1100.jdbc4.jar"/>
+        <!-- Insert resources here -->
+    </resources>
+    <dependencies>
+        <module name="javax.api"/>
+        <module name="javax.transaction.api"/>
+        <module name="javax.servlet.api" optional="true"/>
+    </dependencies>
+</module>
+
+Pronto o driver do postgre está configurado.
+==============================================================================
+Agora é necessário criar um datasource e declarar o driver no arquivo de configurações do Jboss o standalone.xml
+Partindo da pasta do Jboss entre em standalone\configuration e abra o arquivo chamado standalone.xml
+Nesse arquivo dentro da tag <drivers> declare o seguinte driver:
+<driver name="postgre" module="com.postgre">                   
+  <xa-datasource-class>org.postgresql.Driver</xa-datasource-class>
+</driver>
+
+Após feito isso nesse arquivo dentro da tag <datasources> declare o seguinte datasource:
+
+<datasource jndi-name="java:jboss/alunos" pool-name="alunosPostgre" enabled="true" use-java-context="true">
+   <connection-url>jdbc:postgresql:postgres</connection-url>
+   <driver>postgre</driver>
+   <security>
+      <user-name>postgres</user-name>
+      <password>root</password>
+   </security>             
+</datasource>
+
+Nesse data source configure o user name e o password de acordo com o do postgre que estiver usando.
+
+Após feito essa configuração já é possível rodar a aplicação.
+Lembrando que é necessario no postgre criar um banco de dados chamado Bd_Alunos ou mudar o nome do banco de dados na tag <connection-url> do datasource declarado anteriormente.Além de criar a tabela nesse banco da seguinte maneira:
+
+create table public.tb_alunos(
+   matricula varchar(255) not null,
+   nome varchar(255) not null,
+   nota float not null, 
+   primary key(matricula)
+);
+
