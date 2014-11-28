@@ -16,6 +16,7 @@ import projeto.ucb.model.beans.Aluno;
 @Stateless
 @LocalBean
 public class AlunoDAO {
+	
 	@Resource(mappedName = "java:jboss/alunos")
 	private DataSource dataSource;
 	
