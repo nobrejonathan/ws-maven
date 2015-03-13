@@ -1,0 +1,1 @@
+Projeto simples para mostrar as funcionalidades EJB utilizando maven
